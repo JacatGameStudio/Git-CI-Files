@@ -12,10 +12,10 @@ variables:
   IMAGE_VERSION: 1 # This will automatically use latest v1.x.x, see https://github.com/game-ci/docker/releases
   UNITY_DIR: $CI_PROJECT_DIR # this needs to be an absolute path. Defaults to the root of your tree.
   # You can expose this in Unity via Application.version
+  COMMIT_TIME: now
   #VERSION_NUMBER_VAR: $CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID-$CI_JOB_ID
   #VERSION_BUILD_VAR: $CI_PIPELINE_IID
-  #ANDROID_BUILD_NUMBER: "20"
-  #iOS_BUILD_NUMBER: "10"
+  COMMIT_URL: ${CI_PROJECT_URL}/-/commit/${CI_COMMIT_SHA}
   IS_DEVELOPMENT_BUILD: "false"
 
 image: $IMAGE:$UNITY_VERSION-base-$IMAGE_VERSION
@@ -31,25 +31,17 @@ get-unity-version:
     reports:
       dotenv: prepare.env
 
+notify_discord:
+  image:
+    name: bitnami/git
+  stage: prepare
+  script:
+    - COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
+    - chmod +x ./ci/discord_notify.sh && bash ./ci/discord_notify.sh
+
 .unity_before_script: &unity_before_script
   before_script:
-    - mkdir -p /root/.ssh
-
-    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | base64 --decode | ssh-add -
-
-    - chmod 700 /root/.ssh
-
-    # - echo "$SSH_SERVER_HOSTKEYS" > /root/.ssh/known_hosts
-    # - chmod 644 /root/.ssh/known_hosts
-
-    - ssh-keyscan github.com >> ~/.ssh/known_hosts
-    - ssh-keyscan gitlab.volio.vn >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-
-    - ssh-add -l -E sha256
-    
+    - chmod +x ./ci/install_ssh.sh && ./ci/install_ssh.sh
     - chmod +x ./ci/before_script.sh && ./ci/before_script.sh
     - echo "Init git submodules for $BUILD_TARGET"
     - git submodule update --init --recursive
@@ -168,11 +160,11 @@ get-activation-file:
   <<: *unity_defaults
   script:
     - chmod +x ./ci/build.sh && ./ci/build.sh
+    - chmod +x ./ci/discord_notify.sh && bash ./ci/discord_notify.sh
   timeout: 3 hours 30 minutes
   artifacts:
     paths:
       - $UNITY_DIR/Builds/
-    
   # https://gitlab.com/gableroux/unity3d-gitlab-ci-example/-/issues/83
   # you may need to remove or replace these to fit your need if you are using your own runners
   # tags:
@@ -277,7 +269,7 @@ build-ios-xcode-develop:
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ "/^ios/develop.*/"
   when: manual
-    
+
 build-ios-xcode:
   <<: *build
   image: $IMAGE:$UNITY_VERSION-ios-$IMAGE_VERSION
