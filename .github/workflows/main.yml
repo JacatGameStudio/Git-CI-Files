@@ -8,6 +8,7 @@ on:
       - feature/ci
   push:
     branches:
+      - master
       - main
       - develop
       - feature/ci
