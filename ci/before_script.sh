@@ -1,20 +1,18 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e
 set -x
-mkdir -p /root/.cache/unity3d
-mkdir -p /root/.local/share/unity3d/Unity/
+whoami
+mkdir -p ~/.cache/unity3d
+mkdir -p ~/.local/share/unity3d/Unity/
 set +x
 
-unity_license_destination=/root/.local/share/unity3d/Unity/Unity_lic.ulf
+unity_license_destination=~/.local/share/unity3d/Unity/Unity_lic.ulf
 android_keystore_destination=keystore.keystore
 
-
-upper_case_build_target=${BUILD_TARGET^^};
-
-if [ "$upper_case_build_target" = "ANDROID" ]
+if [ "$BUILD_TARGET" = "Android" ]
 then
-    if [ -n $ANDROID_KEYSTORE_BASE64 ]
+    if [ -n "$ANDROID_KEYSTORE_BASE64" ]
     then
         echo "'\$ANDROID_KEYSTORE_BASE64' found, decoding content into ${android_keystore_destination}"
         echo $ANDROID_KEYSTORE_BASE64 | base64 --decode > ${android_keystore_destination}

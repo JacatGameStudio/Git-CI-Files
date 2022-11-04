@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 activation_file=${UNITY_ACTIVATION_FILE:-./unity3d.alf}
 
