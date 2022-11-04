@@ -126,34 +126,6 @@ build-android-app-bundle:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
 
-# build-android-il2cpp:
-#   <<: *build
-#   image: $IMAGE:$UNITY_VERSION-android-$IMAGE_VERSION
-#   variables:
-#     BUILD_TARGET: Android
-#     BUILD_APP_BUNDLE: "false"
-#     SCRIPTING_BACKEND: IL2CPP
-
-deploy-android:
-  stage: deploy
-  image: ruby
-  script:
-    - echo $KEYSTORE_PASS
-    - echo $KEY_ALIAS_NAME
-    - echo $KEY_ALIAS_PASS
-    - echo $ANDROID_KEYSTORE_BASE64
-    - cd $UNITY_DIR/Builds/Android
-    - echo $GPC_TOKEN > gpc_token.json
-    - gem install bundler
-    - bundle install
-    - fastlane supply --aab "${BUILD_NAME}.aab" --track internal --package_name com.youcompany.yourgame --json_key ./gpc_token.json
-  needs: ["build-android-app-bundle"]
-  # only:
-  #   - tags
-  #   - main
-  #   - master
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
 
 build-ios-xcode-develop:
   <<: *build
