@@ -107,6 +107,7 @@ static class BuildCommand
         {
             string[] allOptionVars = envVar.Split(',');
             BuildOptions allOptions = BuildOptions.None;
+            allOptions |= BuildOptions.CompressWithLz4;
             BuildOptions option;
             string optionVar;
             int length = allOptionVars.Length;
