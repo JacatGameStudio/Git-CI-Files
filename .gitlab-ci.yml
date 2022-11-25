@@ -5,7 +5,7 @@ stages:
 # If you are looking for a place where to add 'UNITY_LICENSE_FILE' and other secrets, please visit your project's gitlab page:
 # settings > CI/CD > Variables instead
 variables:
-  BUILD_NAME: ProjectName
+  BUILD_NAME: $CI_PROJECT_NAME
   UNITY_ACTIVATION_FILE: ./unity3d.alf
   IMAGE: unityci/editor # https://hub.docker.com/r/unityci/editor
   IMAGE_VERSION: 1 # This will automatically use latest v1.x.x, see https://github.com/game-ci/docker/releases
@@ -44,8 +44,11 @@ notify_discord:
     - echo "Init git submodules"
     - git submodule update --init --recursive
     - echo "git submodules init done"
+    
+    - echo "call local_find_unity.sh"
+    - chmod +x ./ci/local_find_unity.sh
+    - source ./ci/local_find_unity.sh
 
-    - chmod +x ./ci/local_find_unity.sh && ./ci/local_find_unity.sh
   needs:
     - job: get-unity-version
       artifacts: true
@@ -99,14 +102,13 @@ get-activation-file:
   stage: build_and_test
   <<: *unity_defaults
   script:
-    - chmod +x ./ci/local_find_unity.sh && ./ci/local_find_unity.sh
-    - echo 'local_find_unity done'
     - chmod +x ./ci/build.sh && ./ci/build.sh
     - chmod +x ./ci/discord_notify.sh && bash ./ci/discord_notify.sh
   timeout: 3 hours 30 minutes
   artifacts:
     paths:
       - $UNITY_DIR/Builds/
+  when: manual
 
 build-android:
   <<: *build
@@ -116,8 +118,9 @@ build-android:
     BUILD_APP_BUNDLE: "false"
     BuildOptions: Development
   rules:
-    - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
-    
+  #  - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "features/ci"
+    - when: manual
+
 build-android-app-bundle:
   <<: *build
   image: $IMAGE:$UNITY_VERSION-android-$IMAGE_VERSION
@@ -126,7 +129,8 @@ build-android-app-bundle:
     BUILD_APP_BUNDLE: "true"
     ANDROID_KEYSTORE_BASE64: $ANDROID_KEYSTORE_BASE64
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "features/ci"
+  when: manual
 
 
 build-ios-xcode-develop:
@@ -136,7 +140,9 @@ build-ios-xcode-develop:
     BUILD_TARGET: iOS
     BuildOptions: Development
   rules:
-    - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ "/^ios/develop.*/"
+  #  - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ "/^ios/develop.*/"
+    - when: manual
+
 build-ios-xcode:
   <<: *build
   image: $IMAGE:$UNITY_VERSION-ios-$IMAGE_VERSION
@@ -144,3 +150,4 @@ build-ios-xcode:
     BUILD_TARGET: iOS
   rules:
     - if: $CI_COMMIT_BRANCH =~ "/^ios/main.*/" || $CI_COMMIT_BRANCH =~ "/^ios/master.*/"
+  when: manual
