@@ -2,6 +2,7 @@ using UnityEditor;
 using System.Linq;
 using System;
 using System.IO;
+using UnityEngine;
 
 static class BuildCommand
 {
@@ -81,6 +82,7 @@ static class BuildCommand
         {
             throw new Exception("customBuildName argument is missing");
         }
+        buildName = $"{buildName}_{Application.version}";
         return buildName;
     }
 
