@@ -59,11 +59,12 @@ notify_discord:
       artifacts: true
 
 .cache: &cache
-  cache:
-    key: "$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
-    paths:
-      - $UNITY_DIR/Library/
-
+  cache: []
+  # cache:
+  #   key: "$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+  #   paths:
+  #     - $UNITY_DIR/Library/
+  
 .license: &license
   rules:
     - if: '$UNITY_LICENSE != null'
