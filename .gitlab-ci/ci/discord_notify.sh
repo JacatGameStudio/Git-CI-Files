@@ -1,22 +1,47 @@
 #file-name: discord_notify.sh
 #!/bin/bash
 
-COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
-COMMIT_TIME_STR=$(date -d @$COMMIT_TIME +"%H:%M:%S %d/%m/%Y")
+echo "CI_COMMIT_SHA: $CI_COMMIT_SHA"
+echo "CI_COMMIT_TIMESTAMP: $CI_COMMIT_TIMESTAMP"
+# CI_COMMIT_TIMESTAMP 2022-11-26T10:42:11+07:00
 
-current_time=$(date +"%Y-%m-%dT%H:%M:%S%:z")
-current_timestamp=$(date +"%Y-%m-%dT%H:%M:%S")
+if [[ "$OSTYPE" == "darwin"* ]] ; then # macOS
+    COMMIT_TIME=$(date -j -f "%Y-%m-%dT%H:%M:%S" $CI_COMMIT_TIMESTAMP "+%s") # 1669395600
+    echo "COMMIT_TIME: $COMMIT_TIME"
 
-difference=$(( $(date -d "$current_time" "+%s") - $COMMIT_TIME ))
-commit_timestamp=$(date -d @$COMMIT_TIME +"%Y-%m-%dT%H:%M:%S")
+    COMMIT_TIME_STR=$(date -j -f "%Y-%m-%dT%H:%M:%S" $CI_COMMIT_TIMESTAMP +"%H:%M:%S %d/%m/%Y") # 10:42:11 26/11/2022
+    echo "COMMIT_TIME_STR: $COMMIT_TIME_STR"
 
-echo "COMMIT_TIME_STR: $COMMIT_TIME_STR"
-echo "current_time: $current_time"
-echo "current_timestamp: $current_timestamp"
-echo "difference: $difference"
-echo "commit_timestamp: $commit_timestamp"
-echo "Commit message: $CI_COMMIT_MESSAGE"
-echo "Job: $CI_JOB_NAME with status: $CI_JOB_STATUS"
+    current_time=$(date "+%s")
+    echo "current_time: $current_time"
+
+    current_timestamp=$(date +"%Y-%m-%dT%H:%M:%S")
+    echo "current_timestamp: $current_timestamp"
+
+    difference=$(( $current_time - $COMMIT_TIME ))
+    echo "difference: $difference"
+
+    echo "Commit message: $CI_COMMIT_MESSAGE"
+    echo "Job: $CI_JOB_NAME with status: $CI_JOB_STATUS"
+else
+    COMMIT_TIME=$(date -d $CI_COMMIT_TIMESTAMP "+%s") # 1669395600
+    echo "COMMIT_TIME: $COMMIT_TIME"
+
+    COMMIT_TIME_STR=$(date -d @$COMMIT_TIME +"%H:%M:%S %d/%m/%Y") # 10:42:11 26/11/2022
+    echo "COMMIT_TIME_STR: $COMMIT_TIME_STR"
+
+    current_time=$(date +"%Y-%m-%dT%H:%M:%S%:z")
+    echo "current_time: $current_time"
+
+    current_timestamp=$(date +"%Y-%m-%dT%H:%M:%S")
+    echo "current_timestamp: $current_timestamp"
+
+    difference=$(( $(date -d "$current_time" "+%s") - $COMMIT_TIME ))
+    echo "difference: $difference"
+
+    echo "Commit message: $CI_COMMIT_MESSAGE"
+    echo "Job: $CI_JOB_NAME with status: $CI_JOB_STATUS"
+fi
 
 function duration_time {
     local T=$1

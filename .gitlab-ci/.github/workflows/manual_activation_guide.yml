@@ -1,0 +1,30 @@
+name: Manual activation guide
+on:
+  workflow_call: {}
+jobs:
+  activation:
+    name: Manual activation guide 💉
+    runs-on: self-hosted
+    steps:
+      # Runs a single command using the runners shell
+      - name: Manual activation guide
+        run: |
+          echo ""
+          echo ""
+          echo "### Congratulations! ###"
+          echo "${activation_file} was generated successfully!"
+          echo ""
+          echo "### Next steps ###"
+          echo ""
+          echo "Complete the activation process manually"
+          echo ""
+          echo "   1. Download the artifact which should contain ${activation_file}"
+          echo "   2. Visit https://license.unity3d.com/manual"
+          echo "   3. Upload ${activation_file} in the form"
+          echo "   4. Answer questions (unity pro vs personal edition, both will work, just pick the one you use)"
+          echo "   5. Download 'Unity_v2019.x.ulf' file (year should match your unity version here, 'Unity_v2018.x.ulf' for 2018, etc.)"
+          echo "   6. Copy the content of 'Unity_v2019.x.ulf' license file to your CI's environment variable 'UNITY_LICENSE'. (Open your project's parameters > CI/CD > Variables and add 'UNITY_LICENSE' as the key and paste the content of the license file into the value)"
+          echo ""
+          echo "Once you're done, hit retry on the pipeline where other jobs failed, or just push another commit. Things should be green"
+          echo ""
+          echo "(optional) For more details on why this is not fully automated, visit https://gitlab.com/gableroux/unity3d-gitlab-ci-example/issues/73"
