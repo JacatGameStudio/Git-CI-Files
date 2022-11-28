@@ -33,7 +33,7 @@ get-unity-version:
 
 .notify_discord_script: &notify_discord_script
   after_script:
-    - chmod +x ./.gitlab-ci/ci/discord_notify.sh && bash ./.gitlab-ci/ci/discord_notify.sh
+    - chmod +x ./.gitlab/ci/discord_notify.sh && bash ./.gitlab/ci/discord_notify.sh
 
 notify_discord:
   image:
@@ -45,14 +45,14 @@ notify_discord:
 
 .unity_before_script: &unity_before_script
   before_script:
-    - chmod +x ./.gitlab-ci/ci/before_script.sh && ./.gitlab-ci/ci/before_script.sh
+    - chmod +x ./.gitlab/ci/before_script.sh && ./.gitlab/ci/before_script.sh
     - echo "Init git submodules"
     - git submodule update --init --recursive
     - echo "git submodules init done"
     
     - echo "call local_find_unity.sh"
-    - chmod +x ./.gitlab-ci/ci/local_find_unity.sh
-    - source ./.gitlab-ci/ci/local_find_unity.sh
+    - chmod +x ./.gitlab/ci/local_find_unity.sh
+    - source ./.gitlab/ci/local_find_unity.sh
 
   needs:
     - job: get-unity-version
@@ -84,7 +84,7 @@ get-activation-file:
     - if: '$UNITY_LICENSE == null'
   stage: prepare
   script:
-    - chmod +x ./.gitlab-ci/ci/get_activation_file.sh && ./.gitlab-ci/ci/get_activation_file.sh
+    - chmod +x ./.gitlab/ci/get_activation_file.sh && ./.gitlab/ci/get_activation_file.sh
   artifacts:
     paths:
       - $UNITY_ACTIVATION_FILE
@@ -97,7 +97,7 @@ get-activation-file:
   stage: build_and_test
   <<: *unity_defaults
   script:
-    - chmod +x ./.gitlab-ci/ci/test.sh && ./.gitlab-ci/ci/test.sh
+    - chmod +x ./.gitlab/ci/test.sh && ./.gitlab/ci/test.sh
   artifacts:
     when: always
     expire_in: 2 weeks
@@ -109,7 +109,7 @@ get-activation-file:
     - *unity_defaults
     - *notify_discord_script
   script:
-    - chmod +x ./.gitlab-ci/ci/build.sh && ./.gitlab-ci/ci/build.sh
+    - chmod +x ./.gitlab/ci/build.sh && ./.gitlab/ci/build.sh
   timeout: 3 hours 30 minutes
   artifacts:
     paths:

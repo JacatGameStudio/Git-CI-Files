@@ -1,4 +1,4 @@
-include: "/.gitlab-ci/.gitlab-ci.yml"
+include: "/.gitlab/.gitlab.yml"
 
 variables:
   BUILD_NAME: $CI_PROJECT_NAME
