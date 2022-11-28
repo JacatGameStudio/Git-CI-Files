@@ -1,4 +1,0 @@
-include: "/.gitlab/.gitlab-ci.yml"
-
-variables:
-  BUILD_NAME: $CI_PROJECT_NAME
