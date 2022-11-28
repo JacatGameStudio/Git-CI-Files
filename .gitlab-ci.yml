@@ -1,4 +1,4 @@
 include: "/.gitlab-ci/.gitlab-ci.yml"
 
 variables:
-  BUILD_NAME: EmojiPuzzle
+  BUILD_NAME: $CI_PROJECT_NAME
